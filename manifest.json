@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Bookmark Monitor",
+  "version": "1.0",
+  "permissions": ["bookmarks"],  // 声明书签权限[[4,19]]
+  "background": {
+    "service_worker": "background.js"  // 注册Service Worker[[1,5,19]]
+  }
+  // ,
+  // "host_permissions": ["<待替换为你的目标URL>/*"]  // 允许向目标网址发送请求
+}
