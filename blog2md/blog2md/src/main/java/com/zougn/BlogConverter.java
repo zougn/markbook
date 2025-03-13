@@ -5,6 +5,7 @@ import org.jsoup.nodes.Document;
 import org.commonmark.renderer.markdown.MarkdownRenderer;
 import org.commonmark.parser.Parser;
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
@@ -18,8 +19,8 @@ public class BlogConverter {
     private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
 
     public static void main(String[] args) {
-        convertCsdnToMd("https://blog.csdn.net/xxx/article/details/123");
-        convertCnblogsToMd("https://www.cnblogs.com/xxx/p/123.html");
+        convertCsdnToMd("https://blog.csdn.net/qq_36449972/article/details/136644928");
+        convertCnblogsToMd("https://www.cnblogs.com/haoee/p/16402200.html");
     }
 
     // 转换CSDN文章
