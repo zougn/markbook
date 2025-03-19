@@ -5,18 +5,20 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.api.RemoteSetUrlCommand;
 import java.io.File;
+import java.lang.System;
 import java.io.IOException;
 
 public class GitOperations {
     public static void main(String[] args) {
-        String repoPath = "/root/markbook/";
+        String path = (String)System.getProperty("path");
+	System.out.println(path);
         String remoteUrl = "https://github.com/zougn/markbook.git";
         String username = "zougn";
-        String password = "";
+        String password = (String)System.getProperty("password");
 
         try {
             // 打开本地仓库
-            Git git = Git.open(new File(repoPath));
+            Git git = Git.open(new File(path));
 
             // 添加文件（示例添加所有文件）
             git.add().addFilepattern(".").call();
