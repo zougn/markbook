@@ -29,13 +29,13 @@ public class TestController {
     @PostMapping("/bookmark")
     public ResponseEntity<Map<String, Object>> addBookmarkJson(
         @RequestBody BookmarkRequest request) {
+	System.out.println(request.getTitle());
 	blogConverter.convertCsdnToMd(request.getUrl(),request.getTitle(),request.getFolder());
 	gitOperations.push();
         // 统一处理逻辑
 	Map<String, Object> response = new HashMap<>();
         response.put("status", "success");
         response.put("timestamp", LocalDateTime.now());
-        System.out.println(request.getTitle());
         return ResponseEntity.ok(response);
     }
 

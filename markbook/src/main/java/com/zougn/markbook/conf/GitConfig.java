@@ -29,58 +29,67 @@ public class GitConfig {
     private String username;
     private String password;
 
-
-
-//    @Bean
-    public Git getGit(){
-	    Git git = null;
-	    try{
-	CredentialsProvider provider = new UsernamePasswordCredentialsProvider(username, password);  //生成身份信息
-
-    //本地已存在的文件夹
-    File dirFile = new File(path);
-    if (!dirFile.exists() && !dirFile.mkdirs()) { // 修复3：确保目录存在
-                throw new IOException("Failed to create directory: " + path);
+    /**
+     *  配置凭证（使用GitHub Token更安全）
+     */
+    @Bean
+    public CredentialsProvider getCredentialsProvider(){
+        return new UsernamePasswordCredentialsProvider(username, password);
     }
 
-    //这里我是加了个判断条件
-    boolean hasGitRepo = false;
-    File[] files = dirFile.listFiles();
-    if (files != null) {
-    for (File file : files) {
-        if (file.getName().equals(".git")) {
-            hasGitRepo = true;
-            break;
-        }
-    }}
-    if (!hasGitRepo) {
-        //如果文件夹还没有创建git仓库，则调用创建git本地仓库(推送现有文件夹)
-        git = Git.init().setDirectory(dirFile).call();
+    /**
+     *  配置git
+     */
+    @Bean
+    public Git getGit(CredentialsProvider credentials){
+        Git git = null;
+        try{
+            //本地已存在的文件夹
+            File dirFile = new File(path);
+            if (!dirFile.exists() && !dirFile.mkdirs()) { // 修复3：确保目录存在
+                        throw new IOException("Failed to create directory: " + path);
+            }
 
-    }else{
-        //如果已有git本地仓库，则直接打开（推送现有的 Git 仓库）
-        git = Git.open(dirFile);
-    }
+            //这里我是加了个判断条件
+            boolean hasGitRepo = false;
+            File[] files = dirFile.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.getName().equals(".git")) {
+                        hasGitRepo = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!hasGitRepo) {
+                //如果文件夹还没有创建git仓库，则调用创建git本地仓库(推送现有文件夹)
+                git = Git.cloneRepository().setDirectory(dirFile).setURI(remoteUrl).setCredentialsProvider(credentials).call();
 
-    //设置远程仓库的地址
-    RemoteSetUrlCommand remoteSetUrlCommand = git.remoteSetUrl();
-    remoteSetUrlCommand.setUri(new URIish(remoteUrl));
-    remoteSetUrlCommand.setName("origin");
-    remoteSetUrlCommand.call();
+            }else{
+                //如果已有git本地仓库，则直接打开（推送现有的 Git 仓库）
+                git = Git.open(dirFile);
+            }
+            
+            RemoteSetUrlCommand remoteSetUrlCommand = git.remoteSetUrl();
+            remoteSetUrlCommand.setUri(new URIish(remoteUrl));
+            remoteSetUrlCommand.setName("origin");
+            remoteSetUrlCommand.call();
 
-    //判断一下本地是否存在有main分支
-    Ref mainRef = retainMainRef(git, "main");
-   PullCommand pull = git.pull();
+                //判断一下本地是否存在有main分支
+            Ref mainRef = retainMainRef(git, "main");
 
-   pull.setCredentialsProvider(provider).setRemoteBranchName("main").setRemote("origin").call();
-      }
-      catch (IOException | URISyntaxException | GitAPIException e){
-    throw new RuntimeException("Git initialization failed", e); 
+            PullCommand pull = git.pull();
+
+            pull.setCredentialsProvider(credentials).setRemoteBranchName("main").setRemote("origin").call();
+            System.out.println("拉取成功！");
+        }catch (IOException | URISyntaxException | GitAPIException e){
+            throw new RuntimeException("Git initialization failed", e);
         }
         return Objects.requireNonNull(git, "Git instance should not be null");
     }
 
-    /**
+        /**
      * 判断本地仓库是否存在有某分支，如果没有则创建
      */
     private Ref retainMainRef(Git git, String branchName) throws GitAPIException {
@@ -95,4 +104,3 @@ public class GitConfig {
         return git.branchCreate().setName(branchName).call();
     }
 }
-
