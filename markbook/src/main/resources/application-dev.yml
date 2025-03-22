@@ -1,0 +1,5 @@
+git:
+  path: localrepo # git 本地仓库
+  remoteurl: remoteurl # git 远程仓库
+  username: git_username # git 用户名
+  password: git_token # git 密码

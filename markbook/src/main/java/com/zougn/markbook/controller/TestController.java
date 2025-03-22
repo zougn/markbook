@@ -13,6 +13,7 @@ import java.util.Map;
 import org.springframework.http.MediaType;
 import com.zougn.markbook.domain.BookmarkRequest;
 import com.zougn.markbook.util.BlogConverter;
+import com.zougn.markbook.util.GitOperations;
 import lombok.AllArgsConstructor;
 
 // 使用@RestController注解，表示该类是RESTful控制器，返回数据而非视图
@@ -22,12 +23,14 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class TestController {
 	private final BlogConverter blogConverter;
+	private final GitOperations gitOperations;
 
     // 接收JSON格式参数（适合现代前后端分离架构）
     @PostMapping("/bookmark")
     public ResponseEntity<Map<String, Object>> addBookmarkJson(
         @RequestBody BookmarkRequest request) {
-	blogConverter.convertCsdnToMd(request.getUrl());
+	blogConverter.convertCsdnToMd(request.getUrl(),request.getTitle(),request.getFolder());
+	gitOperations.push();
         // 统一处理逻辑
 	Map<String, Object> response = new HashMap<>();
         response.put("status", "success");

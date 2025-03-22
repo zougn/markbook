@@ -28,12 +28,12 @@ public class BlogConverter {
 	    GitConfig gitConfig = new GitConfig();
 	    gitConfig.setPath("/root/github/");
 	BlogConverter blogConverter=    new BlogConverter(gitConfig);
-       blogConverter.convertCsdnToMd("https://blog.csdn.net/qq_36449972/article/details/136644928");
-       blogConverter.convertCnblogsToMd("https://www.cnblogs.com/haoee/p/16402200.html");
+       blogConverter.convertCsdnToMd("https://blog.csdn.net/qq_36449972/article/details/136644928","云计算服务之SaaS、Paas和Iaas","java/");
+       blogConverter.convertCnblogsToMd("https://www.cnblogs.com/stars-one/p/16975863.html","Jgit的使用笔记","java/");
     }
 
     // 转换CSDN文章
-    public  void convertCsdnToMd(String url) {
+    public  void convertCsdnToMd(String url,String title,String folder) {
         try {
             // 1. 获取HTML
             Document doc = Jsoup.connect(url)
@@ -42,7 +42,7 @@ public class BlogConverter {
                     .get();
 
             // 2. 提取内容
-            String title = doc.selectFirst(".title-article").text();
+            //String title = doc.selectFirst(".title-article").text();
             String content = doc.selectFirst("article").html();
 
             // 3. 转换Markdown
@@ -53,7 +53,7 @@ public class BlogConverter {
 
             // 5. 保存文件
 
-	     saveToFile(title, mdContent);
+	     saveToFile(title, mdContent,folder);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -61,16 +61,16 @@ public class BlogConverter {
     }
 
     // 转换博客园文章
-     private void convertCnblogsToMd(String url) {
+     private void convertCnblogsToMd(String url,String title,String folder) {
         try {
             Document doc = Jsoup.connect(url).get();
-            String title = doc.selectFirst("#post_detail").selectFirst("a").text();
+            //String title = doc.selectFirst("#post_detail").selectFirst("a").text();
             String content = doc.selectFirst("#post_body").html();
 
             String mdContent = htmlToMd(content);
             mdContent = downloadImages(mdContent);
 
-            saveToFile(title, mdContent);
+            saveToFile(title, mdContent,folder);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -104,11 +104,12 @@ public class BlogConverter {
         return mdContent;
     }
 
-    private void saveToFile(String title, String content) {
+    private void saveToFile(String title, String content,String folder) {
         try {
-            Files.createDirectories(Paths.get(SAVE_PATH));
+	    String path = gitConfig.getPath()+SAVE_PATH+folder;
+            Files.createDirectories(Paths.get(path));
             String filename = title.replaceAll("[\\\\/:*?\"<>|]", "_") + ".md";
-            Files.write(Paths.get(gitConfig.getPath()+SAVE_PATH + filename), content.getBytes());
+            Files.write(Paths.get(path + filename), content.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }
