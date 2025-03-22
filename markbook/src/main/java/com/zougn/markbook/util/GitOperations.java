@@ -73,7 +73,8 @@ public class GitOperations {
             PullCommand pull = git.pull();
 
             pull.setCredentialsProvider(credentials).setRemoteBranchName("main").setRemote("origin").call();
-
+            System.out.println("拉取成功！");
+            
             // 添加文件（示例添加所有文件）
             git.add().addFilepattern(".").call();
 
@@ -100,6 +101,7 @@ public class GitOperations {
         List<Ref> refList = git.branchList().call();
         String branchNameStr = "refs/heads/" + branchName;
         for (Ref ref : refList) {
+            System.out.println("ref: "+ref.getName());
             if (ref.getName().equals(branchNameStr)) {
                 return ref;
             }
